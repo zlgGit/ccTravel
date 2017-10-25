@@ -7,9 +7,13 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-    <style name="Translucent" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Translucent" parent="windowExitAnim">
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@color/translucent</item>
+        <item name="android:windowBackground">@color/translucent2</item>
+    </style>
+    <style name="windowExitAnim" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowEnterAnimation">@null</item>
+        <item name="android:windowBackground">@color/transparen0</item>
     </style>
 
 </resources>

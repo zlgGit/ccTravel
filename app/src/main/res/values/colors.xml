@@ -4,7 +4,8 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="dark_txt">#2d2d2d</color>
-    <color name="translucent">#264e4e4e</color>
+    <color name="transparen0">#00fcfcfc</color>
+    <color name="translucent2">#264e4e4e</color>
     <color name="white">#ffffff</color>
     <color name="select_yel">#efbd47</color>
     <color name="unselect_gray">#9f9f9f</color>
