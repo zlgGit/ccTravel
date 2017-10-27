@@ -1,9 +1,14 @@
 package cc.travel.com.cctravel;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -13,11 +18,19 @@ import android.widget.RelativeLayout;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.MapView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cc.travel.com.cctravel.CcHttp.CcHttp;
 import cc.travel.com.cctravel.CcHttp.CcRequest;
+import cc.travel.com.cctravel.MyRequests.MyPostForM;
+import cc.travel.com.cctravel.MyRequests.PostHttp;
 
 public class MainActivity extends AppCompatActivity implements MyTabLayout.OnTabClickListener {
 
@@ -57,12 +70,21 @@ public class MainActivity extends AppCompatActivity implements MyTabLayout.OnTab
         mMap = mMapView.getMap();
         mTablayout.setOnTabClickListener(this);
         mCurrentTab = MyTabLayout.TYPE_KUAICHE;
-        CcHttp<Object> objectCcHttp = new CcHttp<>();
-        CcRequest.Builder builder = new CcRequest.Builder();
-        builder.url("http://10.51.9.14:8080/user/login")
-                .addParam("username","root")
-                .addParam("password","root");
-        objectCcHttp.add(builder.build());
+        MyPostForM myPostForM = new MyPostForM();
+        myPostForM.login("root","root");
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.user_access);
+
+        int width = bitmap.getWidth();
+
+        Log.i("--直接","直接 width"+width);
+
+        decodeResorce(getResources(),R.drawable.user_access);
 
     }
 
@@ -73,6 +95,24 @@ public class MainActivity extends AppCompatActivity implements MyTabLayout.OnTab
                 startActivity(new Intent(MainActivity.this, ProfileActivity.class));
                 break;
             case R.id.chat_access:
+//                File file = Environment.getExternalStorageDirectory();
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.chatmsg);
+//                File file1 = new File(file, "test.png");
+//                try {
+//                    FileOutputStream fileOutputStream = new FileOutputStream(file1);
+//                    boolean compress = bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream);
+//                    boolean compress2 = bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream);
+//                    fileOutputStream.flush();
+//                    fileOutputStream.close();
+//
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+                PostHttp postHttp = new PostHttp();
+                postHttp.postImgT();
+
 
                 break;
         }
@@ -107,5 +147,20 @@ public class MainActivity extends AppCompatActivity implements MyTabLayout.OnTab
                 break;
         }
         mCurrentTab = tab;
+    }
+    private Bitmap decodeResorce(Resources resources,int id)
+    {
+        TypedValue typedValue = new TypedValue();
+        resources.openRawResource(id,typedValue);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inTargetDensity=typedValue.density;
+
+        Log.i("---","density"+typedValue.density);
+
+        Bitmap bitmap = BitmapFactory.decodeResource(resources, id);
+        int width = bitmap.getWidth();
+        Log.i("---","width"+width);
+        return bitmap;
+
     }
 }

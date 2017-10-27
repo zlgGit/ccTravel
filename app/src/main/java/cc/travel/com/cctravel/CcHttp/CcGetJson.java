@@ -28,19 +28,19 @@ import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
+;
 
 /**
  * Created by GW00070468 on 2017/8/15.
  */
 
-class CcGetJson<T> extends CcResponse<T> implements ParamsTask<CcGetJson<T>>{
+class CcGetJson<T> implements ParamsTask<CcGetJson<T>>, CcRequesTask<T> {
 
     private String url;
     private Request mRequest;
     private CcRequest mCcRequest;
     private Headers mHeaders;
-    private OkHttpClient mOkHttpClient=new OkHttpClient();
+    private OkHttpClient mOkHttpClient = new OkHttpClient();
     private CcCallBack mCcCallBack;
     private Class<T> cls;
 
@@ -66,10 +66,10 @@ class CcGetJson<T> extends CcResponse<T> implements ParamsTask<CcGetJson<T>>{
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String string = response.body().string();
-                Log.i("---CcGetJson",string);
+                Log.i("---CcGetJson", string);
                 Observable.just(string)
                         .subscribeOn(Schedulers.io())
-                        .map(new Function<String,Object>() {
+                        .map(new Function<String, Object>() {
 
                             @Override
                             public Object apply(@NonNull String s) throws Exception {
@@ -80,11 +80,11 @@ class CcGetJson<T> extends CcResponse<T> implements ParamsTask<CcGetJson<T>>{
                             }
                         }).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Consumer<Object>() {
-                                       @Override
-                                       public void accept(Object o) throws Exception {
-                                           ccCallBack.onSuccess(((T) o));
-                                       }
-                                   });
+                            @Override
+                            public void accept(Object o) throws Exception {
+                                ccCallBack.onSuccess(((T) o));
+                            }
+                        });
 
 
             }
@@ -113,78 +113,55 @@ class CcGetJson<T> extends CcResponse<T> implements ParamsTask<CcGetJson<T>>{
 
     @Override
     public void add(CcRequest ccRequest) {
-        this.mCcRequest=ccRequest;
-        //url 拼接
-        StringBuilder urlBuilder =null;
-        Map<String, String> params = mCcRequest.mParams;
-        Set<String> keySet = params.keySet();
-        Iterator<String> iterator = keySet.iterator();
+        this.mCcRequest = ccRequest;
+        tranCcReq2OkReq(ccRequest);
 
-        if (iterator.hasNext()) {
-            if (urlBuilder==null)
-            {  urlBuilder=new StringBuilder(mCcRequest.url);
-                String key = iterator.next();
-                urlBuilder.append("?").append(key).append("=").append(params.get(key));
-            }else {
-                String key = iterator.next();
-                urlBuilder.append("&").append(key).append("=").append(params.get(key));
-            }
-        }else {
-            urlBuilder=new StringBuilder(mCcRequest.url);
-        }
-        this.url=urlBuilder.toString();
-        Log.i("---",this.url);
-        // header拼接
-
-        Headers.Builder builder = new Headers.Builder();
-        Map<String, String> headers = mCcRequest.mHeaders;
-        Set<Map.Entry<String, String>> entries = headers.entrySet();
-        Iterator<Map.Entry<String, String>> headerIterator= entries.iterator();
-
-        if (headerIterator.hasNext()) {
-            Map.Entry<String, String> next = headerIterator.next();
-            builder.add(next.getKey(),next.getValue());
-        }
-        mHeaders = builder.build();
-        mRequest=new Request.Builder().url(this.url)
-                .headers(this.mHeaders)
-                .build();
 
     }
 
     @Override
     public void add(Class cls) {
-        this.cls=cls;
+        this.cls = cls;
     }
 
-    public static class Builder<T> implements ParamsTask<Builder>
-    {
+    @Override
+    public void tranCcReq2OkReq(CcRequest ccRequest) {
+        //url 拼接
+        StringBuilder urlBuilder = null;
+        Map<String, String> params = mCcRequest.mParams;
+        Set<String> keySet = params.keySet();
+        Iterator<String> iterator = keySet.iterator();
 
-        @Override
-        public Builder url(String url) {
-            return this;
+        if (iterator.hasNext()) {
+            if (urlBuilder == null) {
+                urlBuilder = new StringBuilder(mCcRequest.url);
+                String key = iterator.next();
+                urlBuilder.append("?").append(key).append("=").append(params.get(key));
+            } else {
+                String key = iterator.next();
+                urlBuilder.append("&").append(key).append("=").append(params.get(key));
+            }
+        } else {
+            urlBuilder = new StringBuilder(mCcRequest.url);
         }
+        this.url = urlBuilder.toString();
+        Log.i("---", this.url);
+        // header拼接
 
-        @Override
-        public Builder addParams(String key, String value) {
-            return this;
-        }
+        Headers.Builder builder = new Headers.Builder();
+        Map<String, String> headers = mCcRequest.mHeaders;
+        Set<Map.Entry<String, String>> entries = headers.entrySet();
+        Iterator<Map.Entry<String, String>> headerIterator = entries.iterator();
 
-        @Override
-        public Builder addHeader(String key, String value) {
-            return this;
+        if (headerIterator.hasNext()) {
+            Map.Entry<String, String> next = headerIterator.next();
+            builder.add(next.getKey(), next.getValue());
         }
-
-        @Override
-        public Builder tag(String tag) {
-            return this;
-        }
-        public CcGetJson build()
-        {
-            return new CcGetJson<T>();
-        }
+        mHeaders = builder.build();
+        mRequest = new Request.Builder().url(this.url)
+                .headers(this.mHeaders)
+                .build();
     }
-
 
 
 }
